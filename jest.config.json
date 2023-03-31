@@ -1,0 +1,13 @@
+{
+  "roots": ["<rootDir>/src"],
+  "testMatch": ["**/__tests__/**/*.+(js|jsx)"],
+  "moduleDirectories": ["node_modules"],
+  "moduleNameMapper": {
+    "^@/(.*)$": "<rootDir>/src/$1"
+  },
+  "transform": {
+    "^.+\\.jsx?$": "babel-jest"
+  },
+  "resolver": "jest-webpack-resolver"
+}
+  
