@@ -1,6 +1,8 @@
 export const GameBoard = () => {
     const board = Array.from({length: 10}, () => Array.from({length: 10}, () => 0));
 
+    const getBoard = () => JSON.parse(JSON.stringify(board));
+
     const validateShipPlacement = (x, y, length, vertical, boardToUse) => {
         for(let i=0; i<length; i++){
             const row = vertical ? x+i : x;
@@ -44,7 +46,9 @@ export const GameBoard = () => {
         }
     };
 
-    const getBoard = () => JSON.parse(JSON.stringify(board));
+    const receiveAttack = () => {
+        
+    };
 
     return {placeShip, getBoard};
 };
