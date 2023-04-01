@@ -77,9 +77,8 @@ export const GameBoard = () => {
             const shipIndex = ships.findIndex(ship => ship.getCords().find(el => sameArr(el, cords)));
             ships[shipIndex].hit();
             if(ships[shipIndex].isSunk()) ships.splice(shipIndex, 1);
-        }else{
-            board[x][y] = 'x';
         }
+        board[x][y] = 'x';
     };
 
     const allSunk = () => ships.length === 0;

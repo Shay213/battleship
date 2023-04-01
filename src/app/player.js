@@ -9,7 +9,14 @@ export class Player{
     playTurn(cords){
         const message = validateCords(cords);
         if(message) throw new Error(message);
+        if(!this.isValidMove(cords)) throw new Error('This square was already chosen');
         this.enemyGameBoard.receiveAttack(cords);
+    }
+
+    isValidMove(cords){
+        const board = this.enemyGameBoard.getBoard();
+        const [x,y] = cords;
+        return board[x][y] !== 'x';
     }
 
     won(){
@@ -34,11 +41,5 @@ export class ComputerPlayer extends Player{
         const x = Math.floor(Math.random() * 10);
         const y = Math.floor(Math.random() * 10);
         return [x,y];
-    }
-
-    isValidMove(cords){
-        const board = this.enemyGameBoard.getBoard();
-        const [x,y] = cords;
-        return board[x][y] === 0;
     }
 }
