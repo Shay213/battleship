@@ -1,7 +1,11 @@
+import { Ship } from "./ship";
+
 export const GameBoard = () => {
     const board = Array.from({length: 10}, () => Array.from({length: 10}, () => 0));
+    const ships = [];
 
     const getBoard = () => board;
+    const sameArr = (a,b) => JSON.stringify(a) === JSON.stringify(b);
 
     const validateShipPlacement = (x, y, length, vertical) => {
         for(let i=0; i<length; i++){
@@ -17,8 +21,8 @@ export const GameBoard = () => {
                 if(y-1 >= 0 && board[row][y-1] === 1) throw new Error();
                 if(y+length < 10 && board[row][y+length] === 1) throw new Error(); 
                 // check diagonal squares
-                if(y-1 >= 0 && row-1 >= 0 && row+1 < 10 && (board[row-1][y-1] || board[row+1][y-1])) throw new Error();
-                if(y+length < 10 && row-1 >= 0 && row+1 < 10 && (board[row-1][y+length] || board[row+1][y+length])) throw new Error();
+                if(y-1 >= 0 && row-1 >= 0 && row+1 < 10 && (board[row-1][y-1] === 1 || board[row+1][y-1] === 1)) throw new Error();
+                if(y+length < 10 && row-1 >= 0 && row+1 < 10 && (board[row-1][y+length] === 1 || board[row+1][y+length] === 1)) throw new Error();
             }
             else{
                 if(col-1 >= 0 && board[row][col - 1] === 1) throw new Error();
@@ -26,16 +30,22 @@ export const GameBoard = () => {
                 if(x-1 >= 0 && board[x-1][col] === 1) throw new Error();
                 if(x+length < 10 && board[x+length][col] === 1) throw new Error();
                 // check diagonal squares
-                if(x-1 >= 0 && col-1 >= 0 && col+1 < 10 && (board[x-1][col-1] || board[x-1][col+1])) throw new Error();
-                if(x+length < 10 && col-1 >= 0 && col+1 < 10 && (board[x+length][col-1] || board[x+length][col+1])) throw new Error();
+                if(x-1 >= 0 && col-1 >= 0 && col+1 < 10 && (board[x-1][col-1] === 1 || board[x-1][col+1] === 1)) throw new Error();
+                if(x+length < 10 && col-1 >= 0 && col+1 < 10 && (board[x+length][col-1] === 1 || board[x+length][col+1] === 1)) throw new Error();
             }
         }
     };
 
-    const validateArgs = (cords, options) => {
+    const validateCords = cords => {
         if(!Array.isArray(cords)) return 'cords must be an array';
         const [x,y] = cords;
         if(!Number.isInteger(x) || !Number.isInteger(y) || cords.length > 2) return 'cords must be an array and contain pair of integers';
+        return false;
+    };
+
+    const validateArgs = (cords, options) => {
+        const message = validateCords(cords);
+        if(message) return message;
         
         if(options && typeof options !== 'object') return 'options must be an object';
         if(options.hasOwnProperty('length') && !Number.isInteger(options.length)) return 'length in options must be integer';
@@ -51,9 +61,10 @@ export const GameBoard = () => {
         if(!options.hasOwnProperty('length')) options['length'] = 1;
         if(!options.hasOwnProperty('vertical')) options['vertical'] = false;
 
-        console.log('placeShip called with:', cords, options);
         const {length, vertical} = options;
         const [x,y] = cords;
+        const shipCords = [];
+
         validateShipPlacement(x, y, length, vertical);
 
         for(let i=0; i<length; i++){
@@ -61,12 +72,23 @@ export const GameBoard = () => {
             const col = vertical ? y : y+i;
 
             board[row][col] = 1;
+            shipCords.push([row, col]);
+        }
+        ships.push(Ship(length, vertical, shipCords));
+    };
+
+    const receiveAttack = cords => {
+        const message = validateCords(cords);
+        if(message) throw new Error(message);
+        const [x, y] = cords;
+        if(board[x][y] === 1){
+            const shipIndex = ships.findIndex(ship => ship.getCords().find(el => sameArr(el, cords)));
+            ships[shipIndex].hit();
+            if(ships[shipIndex].isSunk()) ships.splice(shipIndex, 1);
+        }else{
+            board[x][y] = 'x';
         }
     };
 
-    const receiveAttack = () => {
-
-    };
-
-    return {placeShip, getBoard};
+    return {placeShip, getBoard, receiveAttack};
 };

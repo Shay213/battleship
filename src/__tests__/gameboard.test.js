@@ -1,9 +1,7 @@
 import { GameBoard } from "../app/gameboard";
 
-const gameBoard = GameBoard();
-
 describe('placing ships on the board', () => {
-
+    const gameBoard = GameBoard();
     const board = gameBoard.getBoard(); 
 
     test('placeShip should receive array and optional object', () => {
@@ -14,7 +12,7 @@ describe('placing ships on the board', () => {
         expect(() => gameBoard.placeShip([8,2])).not.toThrow();
         expect(() => gameBoard.placeShip([9,9], {length: 1})).not.toThrow();
         expect(() => gameBoard.placeShip([8,0], {length: 1, vertical: true})).not.toThrow();
-        expect(() => gameBoard.placeShip([8,1], 'length')).toThrow('options must be an object');
+        expect(() => gameBoard.placeShip([9,1], 'length')).toThrow('options must be an object');
     });
 
     test('Mark square on board as taken based on received cords', () => {
@@ -70,4 +68,14 @@ describe('placing ships on the board', () => {
         });
     });
 
+});
+
+
+test('receiveAttack should receive array', () => {
+    const gameBoard = GameBoard();
+    expect(() => gameBoard.receiveAttack()).toThrow('cords must be an array');
+    expect(() => gameBoard.receiveAttack('1,1')).toThrow('cords must be an array');
+    expect(() => gameBoard.receiveAttack([1,'1'])).toThrow('cords must be an array and contain pair of integers');
+    expect(() => gameBoard.receiveAttack([1,1,1])).toThrow('cords must be an array and contain pair of integers');
+    expect(() => gameBoard.receiveAttack([8,2])).not.toThrow();
 });
