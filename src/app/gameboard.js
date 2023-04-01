@@ -1,4 +1,5 @@
 import { Ship } from "./ship";
+import { validateCords } from "./validateCords";
 
 export const GameBoard = () => {
     const board = Array.from({length: 10}, () => Array.from({length: 10}, () => 0));
@@ -36,13 +37,6 @@ export const GameBoard = () => {
         }
     };
 
-    const validateCords = cords => {
-        if(!Array.isArray(cords)) return 'cords must be an array';
-        const [x,y] = cords;
-        if(!Number.isInteger(x) || !Number.isInteger(y) || cords.length > 2) return 'cords must be an array and contain pair of integers';
-        return false;
-    };
-
     const validateArgs = (cords, options) => {
         const message = validateCords(cords);
         if(message) return message;
@@ -78,8 +72,6 @@ export const GameBoard = () => {
     };
 
     const receiveAttack = cords => {
-        const message = validateCords(cords);
-        if(message) throw new Error(message);
         const [x, y] = cords;
         if(board[x][y] === 1){
             const shipIndex = ships.findIndex(ship => ship.getCords().find(el => sameArr(el, cords)));
@@ -90,5 +82,7 @@ export const GameBoard = () => {
         }
     };
 
-    return {placeShip, getBoard, receiveAttack};
+    const allSunk = () => ships.length === 0;
+
+    return {placeShip, getBoard, receiveAttack, allSunk};
 };

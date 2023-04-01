@@ -69,13 +69,3 @@ describe('placing ships on the board', () => {
     });
 
 });
-
-
-test('receiveAttack should receive array', () => {
-    const gameBoard = GameBoard();
-    expect(() => gameBoard.receiveAttack()).toThrow('cords must be an array');
-    expect(() => gameBoard.receiveAttack('1,1')).toThrow('cords must be an array');
-    expect(() => gameBoard.receiveAttack([1,'1'])).toThrow('cords must be an array and contain pair of integers');
-    expect(() => gameBoard.receiveAttack([1,1,1])).toThrow('cords must be an array and contain pair of integers');
-    expect(() => gameBoard.receiveAttack([8,2])).not.toThrow();
-});
