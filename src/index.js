@@ -1,4 +1,4 @@
 import './main.css';
-import { populateHTMLBoards } from './app/populateHTMLBoards';
+import { gameLoop } from './app/gameLoop';
 
-populateHTMLBoards();
+gameLoop();

@@ -2,7 +2,7 @@ import { Player } from "../app/player";
 import { GameBoard } from "../app/gameboard";
 
 const gameBoard = GameBoard();
-const newPlayer = new Player('player1', gameBoard);
+const newPlayer = new Player(gameBoard);
 
 test('playTurn should receive array', () => {
     expect(() => newPlayer.playTurn()).toThrow('cords must be an array');

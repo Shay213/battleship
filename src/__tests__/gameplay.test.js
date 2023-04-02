@@ -40,7 +40,7 @@ test('computer can play a game against human player and win', () => {
     const computerGameBoard = GameBoard();
     populateBoard(humanGameBoard);
     populateBoard(computerGameBoard);
-    const humanPlayer = new Player('play1', computerGameBoard);
+    const humanPlayer = new Player(computerGameBoard);
     const computerPlayer = new ComputerPlayer(humanGameBoard);
     let whoWon = null;
     loop1:

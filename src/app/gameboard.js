@@ -82,6 +82,7 @@ export const GameBoard = () => {
     };
 
     const allSunk = () => ships.length === 0;
+    const getShips = () => ships;
 
-    return {placeShip, getBoard, receiveAttack, allSunk};
+    return {placeShip, getBoard, receiveAttack, allSunk, getShips};
 };

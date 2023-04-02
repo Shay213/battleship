@@ -1,8 +1,7 @@
 import {validateCords} from './validateCords.js'
 
 export class Player{
-    constructor(name, enemyGameBoard){
-        this.name = name;
+    constructor(enemyGameBoard){
         this.enemyGameBoard = enemyGameBoard;
     }
 
@@ -26,7 +25,7 @@ export class Player{
 
 export class ComputerPlayer extends Player{
     constructor(enemyGameBoard){
-        super('Computer', enemyGameBoard);
+        super(enemyGameBoard);
     }
 
     playTurn(){

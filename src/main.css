@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
 
+html {
+    box-sizing: border-box;
+}
+*, *:before, *:after {
+box-sizing: inherit;
+}
+
 body{
     margin: 0;
     padding: 0;
@@ -50,13 +57,22 @@ body{
 .board{
     display: grid;
     grid-template-columns: repeat(10, 40px);
-    border-bottom: 1px solid rgb(28, 119, 255);
-    border-left: 1px solid rgb(28, 119, 255);
+    grid-auto-rows: 40px;
+    border-bottom: 1px solid rgb(129, 177, 248);
+    border-left: 1px solid rgb(129, 177, 248);
+    position: relative;
 }
 
 .board > div{
-    border-top: 1px solid rgb(28, 119, 255);
-    border-right: 1px solid rgb(28, 119, 255);
+    border-top: 1px solid rgb(129, 177, 248);
+    border-right: 1px solid rgb(129, 177, 248);
+}
+
+.board > div.ship{
+    position: absolute;
+    box-sizing: content-box;
+    border: 1px solid blue;
+    outline: 1px solid blue;
 }
 
 .enemy-board{
