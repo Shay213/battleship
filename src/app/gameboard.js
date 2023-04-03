@@ -1,5 +1,6 @@
 import { Ship } from "./ship";
 import { validateCords } from "./validateCords";
+import { markAdjacentSquares } from "./markAdjacentSquares";
 
 export const GameBoard = () => {
     const board = Array.from({length: 10}, () => Array.from({length: 10}, () => 0));
@@ -76,9 +77,17 @@ export const GameBoard = () => {
         if(board[x][y] === 1){
             const shipIndex = ships.findIndex(ship => ship.getCords().find(el => sameArr(el, cords)));
             ships[shipIndex].hit();
-            if(ships[shipIndex].isSunk()) ships.splice(shipIndex, 1);
+            board[x][y] = 's';
+            if(ships[shipIndex].isSunk()){
+                ships[shipIndex].getCords().forEach(([x,y]) => {
+                    markAdjacentSquares(board, x, y, 0, ([adjX, adjY]) => board[adjX][adjY] = 'x');
+                });
+                ships.splice(shipIndex, 1);
+            }   
         }
-        board[x][y] = 'x';
+        else{
+            board[x][y] = 'x';
+        }
     };
 
     const allSunk = () => ships.length === 0;

@@ -66,6 +66,23 @@ body{
 .board > div{
     border-top: 1px solid rgb(129, 177, 248);
     border-right: 1px solid rgb(129, 177, 248);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.enemy-board .board.active > div:not(div.ship):not(div.unavailable):hover::after{
+    content: '';
+    position: absolute;
+    z-index: 11;
+    top: -1px;
+    left: -1px;
+    width: 41px;
+    height: 41px;
+    border: 1px solid rgb(21, 212, 21);
+    outline: 1px solid rgb(21, 212, 21);
+    background-color: rgb(233, 253, 233);
 }
 
 .board > div.ship{
@@ -73,6 +90,11 @@ body{
     box-sizing: content-box;
     border: 1px solid blue;
     outline: 1px solid blue;
+    background-color: rgba(207, 207, 255, 0.308);
+}
+
+.enemy-board .board > div.ship{
+    display: none;
 }
 
 .enemy-board{

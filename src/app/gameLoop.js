@@ -13,6 +13,28 @@ export const gameLoop = () => {
     const computer = new ComputerPlayer(playerGameBoard);
 
     DOM.renderShips(playerGameBoard, computerGameBoard);
+    DOM.activatePlayBtn(startGame);
+
+    function startGame(){
+        DOM.activateEnemyBoard();
+        playRound(player, playerGameBoard, computer, computerGameBoard)
+            .then(winner => console.log(`winner: ${winner.getName()}`))
+            .catch(error => console.log(error));
+        
+        function playRound(player, playerGameBoard, computer, computerGameBoard){
+            return DOM.attack(player, playerGameBoard)
+                .then(won => {
+                    if(won) return player;
+                    
+                    return DOM.attack(computer, computerGameBoard)
+                        .then(won => {
+                            if(won) return computer;
+
+                            return playRound(player, playerGameBoard, computer, computerGameBoard);
+                        });
+                });
+        }
+    }
 };
 
 function populateBoard(gameBoard){

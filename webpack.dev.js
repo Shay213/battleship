@@ -10,13 +10,29 @@ module.exports = merge(common, {
     },
     devtool: 'inline-source-map',
     devServer: {
-        static: './dist',
+        static: {
+          directory: path.join(__dirname, 'src'),
+        },
+        compress: true,
+        port: 9000,
     },
     module: {
         rules: [    
             {
                 test: /\.css$/i,
                 use: ['style-loader', 'css-loader'],
+            },
+            {
+                test: /\.(png|jpe?g|gif|svg)$/i,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[name].[ext]',
+                            publicPath: './assets/'
+                        }
+                    }
+                ],
             },
         ]
     }

@@ -2,6 +2,7 @@ import {validateCords} from './validateCords.js'
 
 export class Player{
     constructor(enemyGameBoard){
+        this.name = 'player';
         this.enemyGameBoard = enemyGameBoard;
     }
 
@@ -15,25 +16,40 @@ export class Player{
     isValidMove(cords){
         const board = this.enemyGameBoard.getBoard();
         const [x,y] = cords;
-        return board[x][y] !== 'x';
+        return board[x][y] !== 'x' && board[x][y] !== 's';
     }
 
     won(){
         return this.enemyGameBoard.allSunk();
+    }
+
+    getEnemyBoard(){
+        return this.enemyGameBoard.getBoard();
+    }
+
+    getName(){
+        return this.name;
     }
 };
 
 export class ComputerPlayer extends Player{
     constructor(enemyGameBoard){
         super(enemyGameBoard);
+        this.name = 'computer';
     }
 
     playTurn(){
+        const cords = this.generateValidMove();
+        this.enemyGameBoard.receiveAttack(cords);
+        return cords;
+    }
+
+    generateValidMove(){
         let cords = this.generateRandomCords();
         while(!this.isValidMove(cords)){
             cords = this.generateRandomCords();
         }
-        this.enemyGameBoard.receiveAttack(cords);
+        return cords;
     }
 
     generateRandomCords(){
