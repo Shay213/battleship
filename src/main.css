@@ -23,7 +23,6 @@ body{
 
 .container{
     display: flex;
-    gap: 150px;
 }
 
 .top-cords{
@@ -99,6 +98,7 @@ body{
 
 .enemy-board{
     position: relative;
+    margin-left: 150px;
 }
 
 .enemy-board > *:not(button){
@@ -153,3 +153,65 @@ body{
     justify-content: center;
     border-radius: 5px;
 }
+
+.destroyed-ships{
+    display: none;
+    grid-template-columns: repeat(8, 14px);
+    grid-auto-rows: 14px;
+    padding: 30px;
+}
+
+.destroyed-ships > div{
+    display: flex;
+    justify-content: space-between;
+}
+
+.destroyed-ships > div > div{
+    background-color: rgb(116, 125, 255);
+    width: 12px;
+    height: 100%;
+}
+
+.destroyed-ships > div.destroyed > div{
+    background-color: rgb(255, 116, 116);
+    width: 12px;
+    height: 100%;
+}
+
+.destroyed-ships > div:first-of-type{
+    grid-area: 1 / 1 / 2 / 5;
+}
+
+.destroyed-ships > div:nth-of-type(2){
+    grid-area: 3 / 1 / 4 / 4;
+}
+
+.destroyed-ships > div:nth-of-type(3){
+    grid-area: 3 / 5 / 4 / 8;
+}
+
+.destroyed-ships > div:nth-of-type(4){
+    grid-area: 5 / 1 / 6 / 3;
+}
+
+.destroyed-ships > div:nth-of-type(5){
+    grid-area: 5 / 4 / 6 / 6;
+}
+
+.destroyed-ships > div:nth-of-type(6){
+    grid-area: 5 / 7 / 6 / 9;
+}
+
+.destroyed-ships > div:nth-of-type(7){
+    grid-area: 7 / 1 / 8 / 2;
+}
+.destroyed-ships > div:nth-of-type(8){
+    grid-area: 7 / 3 / 8 / 4;
+}
+.destroyed-ships > div:nth-of-type(9){
+    grid-area: 7 / 5 / 8 / 6;
+}
+.destroyed-ships > div:nth-of-type(10){
+    grid-area: 7 / 7 / 8 / 8;
+}
+

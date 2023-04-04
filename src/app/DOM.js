@@ -12,6 +12,8 @@ export const DOM = (function(){
     const size = parseInt(playerHTMLBoard.offsetWidth/10);
     const gameResult = document.querySelector('.game-result');
     const messageBox = document.querySelector('.message-box');
+    const playerDestroyedShips = document.querySelector('.player-destroyed-ships');
+    const computerDestroyedShips = document.querySelector('.computer-destroyed-ships');
 
     const renderBoard = () => {
         playerHTMLBoard.innerHTML = '';
@@ -81,7 +83,7 @@ export const DOM = (function(){
                     const shipObj = ships.find(ship => ship.getCords().find(el => _sameArr(el, cords)));
                     const [x, y] = cords;
                     
-                    shipSunkAnimation(shipObj, shipElements, enemySquares);
+                    shipSunkAnimation(shipObj, shipElements, enemySquares, playerDestroyedShips);
                     markSquare(x, y, targetSquare);
 
                     if(board[x][y] === 's'){
@@ -115,7 +117,7 @@ export const DOM = (function(){
                             const shipObj = ships.find(ship => ship.getCords().find(el => _sameArr(el, cords)));
                             player.playTurn(cords);
                             
-                            shipSunkAnimation(shipObj, shipElements, enemySquares);
+                            shipSunkAnimation(shipObj, shipElements, enemySquares, computerDestroyedShips);
                             markSquare(x, y, e.currentTarget);
 
                             if(board[x][y] === 's'){
@@ -148,7 +150,7 @@ export const DOM = (function(){
                 targetSquare.classList.add('unavailable');
             }
 
-            function shipSunkAnimation(shipObj, shipElements, enemySquares){
+            function shipSunkAnimation(shipObj, shipElements, enemySquares, destroyedShipsEl){
                 if(shipObj && shipObj.getCords().every(([x,y]) => board[x][y] === 's')){
                     const shipEl = shipElements.find(ship => shipObj.getCords().find(el => _sameArr(el, _strToArr(ship.dataset.shipcords))));
                     shipEl.style.cssText += 'display: block; border-color: #ff2424; outline-color: #ff2424; background-color: transparent;';
@@ -164,6 +166,11 @@ export const DOM = (function(){
                             }
                         });
                     });
+
+                    const shipLength = shipObj.getLength();
+                    const [...ships] = destroyedShipsEl.querySelectorAll(`div[data-length="${shipLength}"]`);
+                    const notDestroyedShip = ships.find(ship => !ship.classList.contains('destroyed'));
+                    notDestroyedShip.classList.add('destroyed');
                 }
             }
         });
@@ -173,6 +180,8 @@ export const DOM = (function(){
         btn.style.display = 'none';
         enemyBoardElements.forEach(el => el.style.opacity = '1');
         computerHTMLBoard.classList.add('active');
+        playerDestroyedShips.style.display = 'grid';
+        computerDestroyedShips.style.display = 'grid';
     }
 
     const deActivateEnemyBoard = () => {
@@ -188,6 +197,11 @@ export const DOM = (function(){
             gameResult.style.display = 'flex';
             gameResult.querySelector('button').addEventListener('click', e => {
                 gameResult.style.display = 'none';
+                [...playerDestroyedShips.querySelectorAll('div.destroyed'),
+                 ...computerDestroyedShips.querySelectorAll('div.destroyed')]
+                    .forEach(el => el.classList.remove('destroyed'));
+                playerDestroyedShips.style.display = 'none';
+                computerDestroyedShips.style.display = 'none';
                 resolve();
             }, {once: true});
         });
