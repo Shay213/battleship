@@ -5,5 +5,6 @@ export const Ship = (length, vertical, boardCords) => {
     const isSunk = () => length <= hitCount;
     const getCords = () => boardCords;
     const isVertical = () => vertical;
-    return {hit, getHit, isSunk, getCords, isVertical};
+    const getLength = () => length;
+    return {hit, getHit, isSunk, getCords, isVertical, getLength};
 };

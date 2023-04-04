@@ -8,9 +8,15 @@ export const DOM = (function(){
     const computerHTMLBoard = document.querySelector('.enemy-board .board');
     const btn = document.querySelector('.enemy-board > button');
     const enemyBoardElements = document.querySelectorAll('.enemy-board > *:not(button)');
+    const playerBoardElements = document.querySelectorAll('.player-board > *:not(button)');
     const size = parseInt(playerHTMLBoard.offsetWidth/10);
+    const gameResult = document.querySelector('.game-result');
+    const messageBox = document.querySelector('.message-box');
 
     const renderBoard = () => {
+        playerHTMLBoard.innerHTML = '';
+        computerHTMLBoard.innerHTML = '';
+        messageBox.innerHTML = '<p>Place the ships.</p>';
         const boards = [playerHTMLBoard, computerHTMLBoard];
         for(let i=0; i<10; i++){
             for(let j=0; j<10; j++){
@@ -57,25 +63,47 @@ export const DOM = (function(){
 
     const attack = (player, gameBoard) => {
         return new Promise((resolve, reject) => {
-            const ships = gameBoard.getShips();
+            const ships = gameBoard.getShips().slice(0);
             const board = player.getEnemyBoard();
             let cords;
             if(player.getName() === 'computer'){
                 const [...shipElements] = document.querySelectorAll('.player-board .board > div.ship');
                 const enemySquares = playerHTMLBoard.querySelectorAll('div:not(div.ship)');
-                const shipObj = ships.find(ship => ship.getCords().find(el => _sameArr(el, cords)));
-                cords = player.playTurn();
-                const targetSquare = [...enemySquares].find(square => _sameArr(_strToArr(square.dataset.cords), cords));
-                const [x, y] = cords;
 
-                shipSunkAnimation(shipObj, shipElements, enemySquares);
-                markSquare(x, y, targetSquare);
+                messageBox.innerHTML = '<p>Opponents turn, please wait.</p>';
+                enemyBoardElements.forEach(el => el.style.opacity = '.5');
+                playerBoardElements.forEach(el => el.style.opacity = '1');
+                computerHTMLBoard.classList.remove('active');
 
-                resolve(player.won());
+                setTimeout(() => {
+                    cords = player.playTurn();
+                    const targetSquare = [...enemySquares].find(square => _sameArr(_strToArr(square.dataset.cords), cords));
+                    const shipObj = ships.find(ship => ship.getCords().find(el => _sameArr(el, cords)));
+                    const [x, y] = cords;
+                    
+                    shipSunkAnimation(shipObj, shipElements, enemySquares);
+                    markSquare(x, y, targetSquare);
+
+                    if(board[x][y] === 's'){
+                        const won = player.won();
+                        if(won){
+                            resolve(won);
+                        }else{
+                            attack(player, gameBoard).then(resolve);
+                        }
+                    }
+                    else resolve(player.won());
+                }, 500);
             }else{
                 const [...shipElements] = document.querySelectorAll('.enemy-board .board > div.ship');
                 const enemySquares = computerHTMLBoard.querySelectorAll('div:not(div.ship)');
                 let playerMoved = false;
+
+                messageBox.innerHTML = '<p>Your turn.</p>';
+                playerBoardElements.forEach(el => el.style.opacity = '.5');
+                computerHTMLBoard.classList.add('active');
+                enemyBoardElements.forEach(el => el.style.opacity = '1');
+
                 enemySquares.forEach(square => {
                     const squareCords = _strToArr(square.dataset.cords);
                     const [x,y] = squareCords;
@@ -90,7 +118,16 @@ export const DOM = (function(){
                             shipSunkAnimation(shipObj, shipElements, enemySquares);
                             markSquare(x, y, e.currentTarget);
 
-                            resolve(player.won());
+                            if(board[x][y] === 's'){
+                                const won = player.won();
+                                if(won){
+                                    playerBoardElements.forEach(el => el.style.opacity = '1');
+                                    resolve(won);
+                                }else{
+                                    attack(player, gameBoard).then(resolve);
+                                }
+                            }
+                            else resolve(player.won());
                         });
                     }
                 });
@@ -104,7 +141,7 @@ export const DOM = (function(){
                 }
                 else if(board[x][y] === 's'){
                     img.src = xMark;
-                    img.style.cssText = 'width: 42px; height: 42px;';
+                    img.style.cssText = 'width: 49px; height: 49px;';
                     targetSquare.style.backgroundColor = '#fff2f2';
                 }
                 targetSquare.appendChild(img);
@@ -138,13 +175,33 @@ export const DOM = (function(){
         computerHTMLBoard.classList.add('active');
     }
 
-    const activatePlayBtn = (startGame) => btn.addEventListener('click', startGame);
+    const deActivateEnemyBoard = () => {
+        btn.style.display = 'block';
+        enemyBoardElements.forEach(el => el.style.opacity = '.3');
+        computerHTMLBoard.classList.remove('active');
+    };
+
+    const showFinalMessage = (message, playerWon) => {
+        return new Promise(resolve => {
+            gameResult.querySelector('p').innerText = message;
+            playerWon ? gameResult.style.backgroundColor = '#58c42d' : gameResult.style.backgroundColor = '#f70c2b';
+            gameResult.style.display = 'flex';
+            gameResult.querySelector('button').addEventListener('click', e => {
+                gameResult.style.display = 'none';
+                resolve();
+            }, {once: true});
+        });
+    };
+
+    const activatePlayBtn = (startGame) => btn.addEventListener('click', startGame, {once: true});
 
     return {
         renderShips,
         renderBoard,
         activatePlayBtn,
         activateEnemyBoard,
-        attack
+        attack,
+        showFinalMessage,
+        deActivateEnemyBoard
     };
 })();

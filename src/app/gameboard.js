@@ -10,30 +10,32 @@ export const GameBoard = () => {
     const sameArr = (a,b) => JSON.stringify(a) === JSON.stringify(b);
 
     const validateShipPlacement = (x, y, length, vertical) => {
-        for(let i=0; i<length; i++){
-            const row = vertical ? x+i : x;
-            const col = vertical ? y : y+i;
-
-            if(row < 0 || row >= 10 || col < 0 || col >= 10 || board[row][col] === 1) throw new Error();
-            
-            // Check for adjacent ships
-            if(!vertical){
-                if(row-1 >= 0 && board[row-1][col] === 1) throw new Error();
-                if(row+1 < 10 && board[row+1][col] === 1) throw new Error();
-                if(y-1 >= 0 && board[row][y-1] === 1) throw new Error();
-                if(y+length < 10 && board[row][y+length] === 1) throw new Error(); 
-                // check diagonal squares
-                if(y-1 >= 0 && row-1 >= 0 && row+1 < 10 && (board[row-1][y-1] === 1 || board[row+1][y-1] === 1)) throw new Error();
-                if(y+length < 10 && row-1 >= 0 && row+1 < 10 && (board[row-1][y+length] === 1 || board[row+1][y+length] === 1)) throw new Error();
+        const occupiedSquares = new Set();
+        
+        for(const ship of ships){
+            for(const square of ship.getCords()){
+                occupiedSquares.add(square.join(','));
             }
-            else{
-                if(col-1 >= 0 && board[row][col - 1] === 1) throw new Error();
-                if(col+1 < 10 && board[row][col + 1] === 1) throw new Error();
-                if(x-1 >= 0 && board[x-1][col] === 1) throw new Error();
-                if(x+length < 10 && board[x+length][col] === 1) throw new Error();
-                // check diagonal squares
-                if(x-1 >= 0 && col-1 >= 0 && col+1 < 10 && (board[x-1][col-1] === 1 || board[x-1][col+1] === 1)) throw new Error();
-                if(x+length < 10 && col-1 >= 0 && col+1 < 10 && (board[x+length][col-1] === 1 || board[x+length][col+1] === 1)) throw new Error();
+        }
+        
+        for(let i = 0; i < length; i++){
+            const row = vertical ? x + i : x;
+            const col = vertical ? y : y + i;
+        
+            if(row < 0 || row >= 10 || col < 0 || col >= 10 || occupiedSquares.has(`${row},${col}`)){
+                throw new Error();
+            }
+        
+            // Check for adjacent squares
+            for (let r = row - 1; r <= row + 1; r++){
+                for (let c = col - 1; c <= col + 1; c++){
+                    if (r < 0 || r >= 10 || c < 0 || c >= 10){
+                        continue;
+                    }
+                    if(occupiedSquares.has(`${r},${c}`)){
+                        throw new Error();
+                    }
+                }
             }
         }
     };
