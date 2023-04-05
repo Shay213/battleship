@@ -47,20 +47,22 @@ export const DOM = (function(){
         let initialShipX = 0;
         let initialShipY = 0;
         let prevValidPosition = null;
+        let shipClicked = false;
 
         btn.addEventListener('click', () => {
             document.removeEventListener('mousedown', getInitialValues);
             document.removeEventListener('mousemove', dragShip);
-            document.removeEventListener('mouseup', goToPrevValidPos);
+            document.removeEventListener('mouseup', handleShipClickOrDragEnd);
         });
         
         document.addEventListener('mousedown', getInitialValues);
         document.addEventListener('mousemove', dragShip);
-        document.addEventListener('mouseup', goToPrevValidPos);
+        document.addEventListener('mouseup', handleShipClickOrDragEnd);
 
         function getInitialValues(e){
             if(e.target.classList.contains('ship')){
-                isDragging = true;
+                shipClicked = true;
+                isDragging = false;
                 currShipObj = ships.find(shipObj => shipObj.getCords().find(cord => _sameArr(cord, _strToArr(e.target.dataset.shipcords))));
                 currShipElement = e.target;
                 initialMouseX = e.clientX;
@@ -77,7 +79,8 @@ export const DOM = (function(){
         }
 
         function dragShip(e){
-            if(isDragging){
+            if((isDragging || (Math.abs(e.clientX - initialMouseX) > 5 || Math.abs(e.clientY - initialMouseY) > 5)) && shipClicked){
+                isDragging = true;
                 currShipElement.style.cursor = 'grabbing';
                 const dx = e.clientX - initialMouseX;
                 const dy = e.clientY - initialMouseY;
@@ -108,12 +111,57 @@ export const DOM = (function(){
             }
         };
 
-        function goToPrevValidPos(e){
+        function handleShipClickOrDragEnd(e){
             if(isDragging){
                 isDragging = false;
+                shipClicked = false;
                 currShipElement.classList.remove('valid-pos-dragging');
                 currShipElement.style.cursor = 'grab';
                 currShipElement.style.transform = `translate(${(prevValidPosition[1] * size)-1}px, ${prevValidPosition[0] * size}px)`;
+            }
+            else if(e.target.classList.contains('ship')){
+                rotateShip();
+                shipClicked = false;
+            }
+        }
+
+        function rotateShip(){   
+            const shipCords = _strToArr(currShipElement.dataset.shipcords);
+            const shipObj = ships.find(ship => _sameArr(ship.getCords()[0], shipCords));
+            const isVertical = shipObj.isVertical();
+            const length = shipObj.getLength();
+            const [row, col] = shipCords;
+            const newCords = !isVertical ? Array.from({length}, (_, i) => [row + i,col,]): Array.from({length}, (_, i) => [row,col + i,]);
+
+            try{
+                gameBoard.validateShipPlacement(row, col, length, !isVertical, shipObj);
+                shipObj.setIsVertical(!isVertical);
+                if(!isVertical === true){
+                    currShipElement.style.width = `${size-1}px`;
+                    currShipElement.style.height = `${(size * length)-1}px`;
+                }else{
+                    currShipElement.style.width = `${(size * length)-1}px`;
+                    currShipElement.style.height = `${size-1}px`;
+                }
+                const board = gameBoard.getBoard();   
+                currShipObj.getCords().forEach(([x,y]) => board[x][y] = 0);
+                newCords.forEach(([x,y]) => board[x][y] = 1);
+                currShipObj.updateBoardCords(newCords);
+            }catch(error){
+                const computedStyle = window.getComputedStyle(currShipElement);
+                const transform = computedStyle.transform;
+                const transformValues = transform.split(/\(|\)|,/).slice(1, -1);
+                const x = parseFloat(transformValues[4]) || 0;
+                const y = parseFloat(transformValues[5]) || 0;
+                currShipElement.animate([
+                    {transform: `translate(${x}px, ${y}px)`, borderColor: 'rgb(255, 116, 116)', outlineColor: 'rgb(255, 116, 116)'},
+                    {transform: `translate(${x-5}px, ${y}px)`, borderColor: 'rgb(255, 116, 116)', outlineColor: 'rgb(255, 116, 116)'},
+                    {transform: `translate(${x+5}px, ${y}px)`, borderColor: 'rgb(255, 116, 116)', outlineColor: 'rgb(255, 116, 116)'},
+                    {transform: `translate(${x-5}px, ${y}px)`, borderColor: 'rgb(255, 116, 116)', outlineColor: 'rgb(255, 116, 116)'},
+                    {transform: `translate(${x+5}px, ${y}px)`, borderColor: 'rgb(255, 116, 116)', outlineColor: 'rgb(255, 116, 116)'},
+                    {transform: `translate(${x}px, ${y}px)`, borderColor: 'blue', outlineColor: 'blue'},
+                ], 
+                {duration: 500, iterations: 1});
             }
         }
     };
@@ -126,7 +174,7 @@ export const DOM = (function(){
             div.classList.add('ship');
             div.setAttribute('data-shipCords', `${cords[0]}`);
             
-            if (ship.isVertical()) {
+            if(ship.isVertical()) {
                 div.style.width = `${size-1}px`;
                 div.style.height = `${(size * length)-1}px`;
                 div.style.transform = `translate(${(cords[0][1] * size)-1}px, ${cords[0][0] * size}px)`;

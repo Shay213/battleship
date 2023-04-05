@@ -7,5 +7,6 @@ export const Ship = (length, vertical, boardCords) => {
     const isVertical = () => vertical;
     const getLength = () => length;
     const updateBoardCords = cords => boardCords = cords; 
-    return {hit, getHit, isSunk, getCords, isVertical, getLength, updateBoardCords};
+    const setIsVertical = isVertical => vertical = isVertical; 
+    return {hit, getHit, isSunk, getCords, isVertical, getLength, updateBoardCords, setIsVertical};
 };
