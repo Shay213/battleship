@@ -15,6 +15,9 @@ export const DOM = (function(){
     const playerDestroyedShips = document.querySelector('.player-destroyed-ships');
     const computerDestroyedShips = document.querySelector('.computer-destroyed-ships');
 
+    const _strToArr = str => str.split(',').map(c => +c);
+    const _sameArr = (a,b) => JSON.stringify(a) === JSON.stringify(b);
+
     const renderBoard = () => {
         playerHTMLBoard.innerHTML = '';
         computerHTMLBoard.innerHTML = '';
@@ -31,6 +34,90 @@ export const DOM = (function(){
         }
     };
 
+    const settingUpShips = gameBoard => {
+        const ships = gameBoard.getShips();
+        
+        let currShipObj = null;
+        let currShipElement = null;
+        let isDragging = false;
+        let squaresFromLeft = null;
+        let squaresFromTop = null;
+        let initialMouseX = 0;
+        let initialMouseY = 0;
+        let initialShipX = 0;
+        let initialShipY = 0;
+        let prevValidPosition = null;
+
+        btn.addEventListener('click', () => {
+            document.removeEventListener('mousedown', getInitialValues);
+            document.removeEventListener('mousemove', dragShip);
+            document.removeEventListener('mouseup', goToPrevValidPos);
+        });
+        
+        document.addEventListener('mousedown', getInitialValues);
+        document.addEventListener('mousemove', dragShip);
+        document.addEventListener('mouseup', goToPrevValidPos);
+
+        function getInitialValues(e){
+            if(e.target.classList.contains('ship')){
+                isDragging = true;
+                currShipObj = ships.find(shipObj => shipObj.getCords().find(cord => _sameArr(cord, _strToArr(e.target.dataset.shipcords))));
+                currShipElement = e.target;
+                initialMouseX = e.clientX;
+                initialMouseY = e.clientY;
+                const computedStyle = window.getComputedStyle(e.target);
+                const transform = computedStyle.transform;
+                const transformValues = transform.split(/\(|\)|,/).slice(1, -1);
+                initialShipX = parseFloat(transformValues[4]) || 0;
+                initialShipY = parseFloat(transformValues[5]) || 0;
+                squaresFromLeft = Math.floor(initialShipX / size + 0.5);
+                squaresFromTop = Math.floor(initialShipY / size + 0.5);
+                prevValidPosition = [squaresFromTop, squaresFromLeft];
+            }
+        }
+
+        function dragShip(e){
+            if(isDragging){
+                currShipElement.style.cursor = 'grabbing';
+                const dx = e.clientX - initialMouseX;
+                const dy = e.clientY - initialMouseY;
+                const newShipX = initialShipX + dx;
+                const newShipY = initialShipY + dy;
+                const currSquaresFromLeft = Math.floor(newShipX/size + 0.5);
+                const currSquaresFromTop = Math.floor(newShipY/size + 0.5);
+
+                const newCords = currShipObj.isVertical() ? 
+                    Array.from({ length: currShipObj.getLength() }, (_, i) => [currSquaresFromTop + i,currSquaresFromLeft,])
+                        : Array.from({ length: currShipObj.getLength() }, (_, i) => [currSquaresFromTop,currSquaresFromLeft + i,]);
+                
+                try{
+                    gameBoard.validateShipPlacement(currSquaresFromTop, currSquaresFromLeft, currShipObj.getLength(), currShipObj.isVertical(), currShipObj);  
+                    currShipElement.classList.add('valid-pos-dragging');
+                    const board = gameBoard.getBoard();   
+                    currShipObj.getCords().forEach(([x,y]) => board[x][y] = 0);
+                    newCords.forEach(([x,y]) => board[x][y] = 1);
+                    currShipObj.updateBoardCords(newCords);
+                    currShipElement.dataset.shipcords = `${currSquaresFromTop},${currSquaresFromLeft}`;
+                    currShipElement.style.transform = `translate(${(currSquaresFromLeft * size)-1}px, ${currSquaresFromTop * size}px)`;
+                    prevValidPosition = [currSquaresFromTop, currSquaresFromLeft];
+                }   
+                catch(e){
+                    currShipElement.classList.remove('valid-pos-dragging');
+                    currShipElement.style.transform = `translate(${newShipX}px, ${newShipY}px)`;
+                }
+            }
+        };
+
+        function goToPrevValidPos(e){
+            if(isDragging){
+                isDragging = false;
+                currShipElement.classList.remove('valid-pos-dragging');
+                currShipElement.style.cursor = 'grab';
+                currShipElement.style.transform = `translate(${(prevValidPosition[1] * size)-1}px, ${prevValidPosition[0] * size}px)`;
+            }
+        }
+    };
+
     const _addShipsToHTMLBoard = (ships, board) => {
         ships.forEach((ship, i) => {
             const cords = ship.getCords();
@@ -38,7 +125,7 @@ export const DOM = (function(){
             const div = document.createElement('div');
             div.classList.add('ship');
             div.setAttribute('data-shipCords', `${cords[0]}`);
-
+            
             if (ship.isVertical()) {
                 div.style.width = `${size-1}px`;
                 div.style.height = `${(size * length)-1}px`;
@@ -59,9 +146,6 @@ export const DOM = (function(){
         _addShipsToHTMLBoard(playerShips, playerHTMLBoard);
         _addShipsToHTMLBoard(computerShips, computerHTMLBoard);
     };   
-
-    const _strToArr = str => str.split(',').map(c => +c);
-    const _sameArr = (a,b) => JSON.stringify(a) === JSON.stringify(b);
 
     const attack = (player, gameBoard) => {
         return new Promise((resolve, reject) => {
@@ -182,6 +266,7 @@ export const DOM = (function(){
         computerHTMLBoard.classList.add('active');
         playerDestroyedShips.style.display = 'grid';
         computerDestroyedShips.style.display = 'grid';
+        playerHTMLBoard.querySelectorAll('div.ship').forEach(el => el.style.cursor = 'auto');
     }
 
     const deActivateEnemyBoard = () => {
@@ -202,6 +287,7 @@ export const DOM = (function(){
                     .forEach(el => el.classList.remove('destroyed'));
                 playerDestroyedShips.style.display = 'none';
                 computerDestroyedShips.style.display = 'none';
+                playerHTMLBoard.querySelectorAll('div.ship').forEach(el => el.style.cursor = 'grab');
                 resolve();
             }, {once: true});
         });
@@ -216,6 +302,7 @@ export const DOM = (function(){
         activateEnemyBoard,
         attack,
         showFinalMessage,
-        deActivateEnemyBoard
+        deActivateEnemyBoard,
+        settingUpShips
     };
 })();

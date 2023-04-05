@@ -15,6 +15,7 @@ export const gameLoop = () => {
 
     DOM.renderShips(playerGameBoard, computerGameBoard);
     DOM.activatePlayBtn(startGame);
+    DOM.settingUpShips(playerGameBoard);
 
     function startGame(){
         DOM.activateEnemyBoard();

@@ -4,15 +4,16 @@ import { markAdjacentSquares } from "./markAdjacentSquares";
 
 export const GameBoard = () => {
     const board = Array.from({length: 10}, () => Array.from({length: 10}, () => 0));
-    const ships = [];
+    let ships = [];
 
     const getBoard = () => board;
     const sameArr = (a,b) => JSON.stringify(a) === JSON.stringify(b);
 
-    const validateShipPlacement = (x, y, length, vertical) => {
+    const validateShipPlacement = (x, y, length, vertical, excludeShip=null) => {
         const occupiedSquares = new Set();
         
         for(const ship of ships){
+            if(excludeShip && sameArr(ship.getCords(), excludeShip.getCords())) continue;
             for(const square of ship.getCords()){
                 occupiedSquares.add(square.join(','));
             }
@@ -95,5 +96,5 @@ export const GameBoard = () => {
     const allSunk = () => ships.length === 0;
     const getShips = () => ships;
 
-    return {placeShip, getBoard, receiveAttack, allSunk, getShips};
+    return {placeShip, getBoard, receiveAttack, allSunk, getShips, validateShipPlacement};
 };

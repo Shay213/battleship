@@ -82,6 +82,7 @@ body{
     border: 1px solid rgb(21, 212, 21);
     outline: 1px solid rgb(21, 212, 21);
     background-color: rgb(233, 253, 233);
+    cursor: pointer;
 }
 
 .board > div.ship{
@@ -90,6 +91,16 @@ body{
     border: 1px solid blue;
     outline: 1px solid blue;
     background-color: rgba(207, 207, 255, 0.308);
+    z-index: 100;
+}
+
+.board > div.ship.valid-pos-dragging{
+    border-color: rgb(21, 212, 21);
+    outline-color: rgb(21, 212, 21);
+}
+
+.player-board .board > div.ship{
+    cursor: grab;
 }
 
 .enemy-board .board > div.ship{
