@@ -1,0 +1,228 @@
+@import url(https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap);
+html {
+    box-sizing: border-box;
+}
+*, *:before, *:after {
+box-sizing: inherit;
+}
+
+body{
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.main-container{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.container{
+    display: flex;
+}
+
+.top-cords{
+    display: grid;
+    grid-template-columns: repeat(11, 40px);
+    grid-template-rows: 40px;
+}
+
+.left-cords{
+    display: grid;
+    grid-template-rows: repeat(10, 40px);
+    grid-template-columns: 40px;
+}
+
+.top-cords p,
+.left-cords p{
+    margin: 0;
+}
+
+.top-cords div,
+.left-cords div{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wrapper{
+    display: flex;
+}
+
+.board{
+    display: grid;
+    grid-template-columns: repeat(10, 40px);
+    grid-auto-rows: 40px;
+    border-bottom: 1px solid rgb(129, 177, 248);
+    border-left: 1px solid rgb(129, 177, 248);
+    position: relative;
+}
+
+.board > div{
+    border-top: 1px solid rgb(129, 177, 248);
+    border-right: 1px solid rgb(129, 177, 248);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.enemy-board .board.active > div:not(div.ship):not(div.unavailable):hover::after{
+    content: '';
+    position: absolute;
+    z-index: 11;
+    top: -1px;
+    left: -1px;
+    width: 41px;
+    height: 41px;
+    border: 1px solid rgb(21, 212, 21);
+    outline: 1px solid rgb(21, 212, 21);
+    background-color: rgb(233, 253, 233);
+    cursor: pointer;
+}
+
+.board > div.ship{
+    position: absolute;
+    box-sizing: content-box;
+    border: 1px solid blue;
+    outline: 1px solid blue;
+    background-color: rgba(207, 207, 255, 0.308);
+    z-index: 100;
+}
+
+.board > div.ship.valid-pos-dragging{
+    border-color: rgb(21, 212, 21);
+    outline-color: rgb(21, 212, 21);
+}
+
+.player-board .board > div.ship{
+    cursor: grab;
+}
+
+.enemy-board .board > div.ship{
+    display: none;
+}
+
+.enemy-board{
+    position: relative;
+    margin-left: 150px;
+}
+
+.enemy-board > *:not(button){
+    opacity: .3;
+}
+
+.enemy-board > button{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 10;
+    transform: translate(-50%, -50%);
+    font-size: 1.4rem;
+    font-weight: 700;
+    border: 1px solid rgb(75, 177, 75);
+    outline: none;
+    border-radius: 12px;
+    padding: 8px 20px;
+    background-color: rgb(86, 211, 86);
+    cursor: pointer;
+}
+
+.enemy-board > button:hover{
+    opacity: .9;
+}
+
+.game-result{
+    position: absolute;
+    top: 30px;
+    display: flex;
+    color: #fff;
+    font-weight: 700;
+    flex-direction: column;
+    align-items: center;
+    width: 300px;
+    padding-bottom: 20px;
+    border-radius: 5px;
+    display: none;
+}
+
+.game-result button{
+    width: 100px;
+    font-size: .9rem;
+    padding: 6px 0;
+    cursor: pointer;
+}
+
+.message-box{
+    background-color: rgb(238, 238, 238);
+    width: 300px;
+    display: flex;
+    justify-content: center;
+    border-radius: 5px;
+}
+
+.destroyed-ships{
+    display: none;
+    grid-template-columns: repeat(8, 14px);
+    grid-auto-rows: 14px;
+    padding: 30px;
+}
+
+.destroyed-ships > div{
+    display: flex;
+    justify-content: space-between;
+}
+
+.destroyed-ships > div > div{
+    background-color: rgb(116, 125, 255);
+    width: 12px;
+    height: 100%;
+}
+
+.destroyed-ships > div.destroyed > div{
+    background-color: rgb(255, 116, 116);
+    width: 12px;
+    height: 100%;
+}
+
+.destroyed-ships > div:first-of-type{
+    grid-area: 1 / 1 / 2 / 5;
+}
+
+.destroyed-ships > div:nth-of-type(2){
+    grid-area: 3 / 1 / 4 / 4;
+}
+
+.destroyed-ships > div:nth-of-type(3){
+    grid-area: 3 / 5 / 4 / 8;
+}
+
+.destroyed-ships > div:nth-of-type(4){
+    grid-area: 5 / 1 / 6 / 3;
+}
+
+.destroyed-ships > div:nth-of-type(5){
+    grid-area: 5 / 4 / 6 / 6;
+}
+
+.destroyed-ships > div:nth-of-type(6){
+    grid-area: 5 / 7 / 6 / 9;
+}
+
+.destroyed-ships > div:nth-of-type(7){
+    grid-area: 7 / 1 / 8 / 2;
+}
+.destroyed-ships > div:nth-of-type(8){
+    grid-area: 7 / 3 / 8 / 4;
+}
+.destroyed-ships > div:nth-of-type(9){
+    grid-area: 7 / 5 / 8 / 6;
+}
+.destroyed-ships > div:nth-of-type(10){
+    grid-area: 7 / 7 / 8 / 8;
+}
+
+
